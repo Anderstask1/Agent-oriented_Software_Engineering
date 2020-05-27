@@ -45,8 +45,8 @@ add call_sorting_bot(B) && (\+ belief has_box) => [
 
 	act (getSortingBot, SortingBot),
 	(
-		not(check_agent_belief(SortingBot, busy)),
-		add_agent_belief(SortingBot, busy)
+		not(check_agent_belief(SortingBot, isBusy)),
+		add_agent_belief(SortingBot, isBusy)
 	),
 	add_agent_desire(SortingBot, pickup(B)),
 
@@ -59,8 +59,8 @@ add call_drone(B) && (\+ belief has_box)  => [
 	
 	act (getDrone, Drone),
 	(
-		not(check_agent_belief(Drone, busy)),
-		add_agent_belief(Drone, busy)
+		not(check_agent_belief(Drone, isBusy)),
+		add_agent_belief(Drone, isBusy)
 	),
 	add_agent_desire(Drone, pickup(B)),
 	
@@ -71,10 +71,10 @@ add call_drone(B) && (\+ belief has_box)  => [
 
 add return && (\+ belief has_box) => [
 
+	del_belief(isBusy),
+
 	act (getChargingStation, Base),
 	cr goto(Base),
-
-	del_belief(busy),
 
 	stop
 ].

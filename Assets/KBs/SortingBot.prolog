@@ -34,8 +34,8 @@ add call_rail_bot(B) && (\+ belief has_box) => [
 
 	act (getRailBot(D), RailBot),
 	(
-		not(check_agent_belief(RailBot, busy)),
-		add_agent_belief(RailBot, busy)
+		not(check_agent_belief(RailBot, isBusy)),
+		add_agent_belief(RailBot, isBusy)
 	),
 	add_agent_desire(RailBot, pickup(B)),
 
@@ -46,10 +46,10 @@ add call_rail_bot(B) && (\+ belief has_box) => [
 
 add return && (\+ belief has_box) => [
 
+	del_belief(isBusy),
+
 	act (getChargingStation, Base),
 	cr goto(Base),
-
-	del_belief(busy),
 
 	stop
 ].
