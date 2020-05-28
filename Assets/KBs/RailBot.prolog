@@ -1,80 +1,60 @@
 :- consult("UnityLogic/KBs/UnityLogicAgentAPI.prolog").
 
-add pickup(B) && (\+ belief has_box) => [
+add pickup(B) && (\+ belief delivered(B))  => [
+
+	B \= false,
 
 	cr goto(B),
 	act pickup(B),
-	add_belief(has_box),
 
-	add_desire(deliver(B)),
-
-	stop
-].
-
-add deliver(B) && (belief has_box) => [
-
-	check_artifact_belief(B, first_half),
-	
 	act (getExchangeArea, ExchangeArea),
 	cr goto(ExchangeArea),
-	cr dropDown(ExchangeArea),
-	del_belief(has_box),
-
-	add_desire(call_sorting_bot(B)),
-
-	stop
-].
-
-add deliver(B) && (belief has_box) => [
-
-	check_artifact_belief(B, second_half),
-	check_artifact_belief(B, startArea(S)),
-
-	act (getArea(S), Area),
-
-	cr goto(Area),
-	cr dropDown(Area),
-	del_belief(has_box),
-
-	add_desire(call_drone(B)),
-
-	stop
-].
-
-add call_sorting_bot(B) && (\+ belief has_box) => [
 
 	act (getSortingBot, SortingBot),
-	(
-		not(check_agent_belief(SortingBot, isBusy)),
-		add_agent_belief(SortingBot, isBusy)
-	),
+
+	cr dropDown(ExchangeArea),
+
 	add_agent_desire(SortingBot, pickup(B)),
 
-	add_desire(return),
-
-	stop
-].
-
-add call_drone(B) && (\+ belief has_box)  => [
-	
-	act (getDrone, Drone),
-	(
-		not(check_agent_belief(Drone, isBusy)),
-		add_agent_belief(Drone, isBusy)
-	),
-	add_agent_desire(Drone, pickup(B)),
-	
-	add_desire(return),
-
-	stop
-].
-
-add return && (\+ belief has_box) => [
-
-	del_belief(isBusy),
+	add_belief(delivered(B)),
 
 	act (getChargingStation, Base),
 	cr goto(Base),
+
+	del_belief(isBusy),
+
+	stop
+].
+
+
+add deliver(B) && (\+ belief delivered(B))  => [
+
+	B \= false,
+
+	check_artifact_belief(B, startArea(S)),
+
+	cr goto(B),
+	act pickup(B),
+
+	act (getArea(S), Area),
+	cr goto(Area),
+
+	act (getDrone, Drone),
+	(
+        not(check_agent_belief(Drone, isBusy)),
+        add_agent_belief(Drone, isBusy)
+	),
+
+	cr dropDown(Area),
+
+	add_agent_desire(Drone, deliver(B)),
+
+	add_belief(delivered(B)),
+
+	act (getChargingStation, Base),
+	cr goto(Base),
+
+	del_belief(isBusy),
 
 	stop
 ].
